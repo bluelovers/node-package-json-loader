@@ -1,0 +1,45 @@
+{
+  "name": "package-json-loader",
+  "version": "1.0.0",
+  "private": false,
+  "description": "Find and load configuration from a package.json",
+  "keywords": [
+    "find",
+    "json",
+    "loader",
+    "module",
+    "npm",
+    "package",
+    "sort",
+    "config",
+    "conf",
+    "pkg",
+    "yarn"
+  ],
+  "license": "ISC",
+  "author": "",
+  "contributors": [],
+  "main": "index.js",
+  "bin": {},
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "config": {},
+  "dependencies": {
+    "bind-decorator": "^1.0.11",
+    "fs-extra": "^7.0.0",
+    "pkg-up": "^2.0.0",
+    "sort-package-json2": "^0.0.3"
+  },
+  "devDependencies": {},
+  "peerDependencies": {},
+  "bundleDependencies": [],
+  "optionalDependencies": {},
+  "resolutions": {},
+  "preferGlobal": true,
+  "publishConfig": {},
+  "licenses": []
+}
