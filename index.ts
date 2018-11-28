@@ -1,6 +1,6 @@
 import * as fs from 'fs-extra';
 import PACKAGE_JSON = require('./package.json');
-import { sortPackageJson } from 'sort-package-json2';
+import { sortPackageJson } from 'sort-package-json';
 import pkgUp = require('pkg-up');
 import bind from 'bind-decorator';
 import { fixBinPath } from './util';

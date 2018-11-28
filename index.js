@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 const fs = require("fs-extra");
-const sort_package_json2_1 = require("sort-package-json2");
+const sort_package_json_1 = require("sort-package-json");
 const pkgUp = require("pkg-up");
 const bind_decorator_1 = require("bind-decorator");
 const util_1 = require("./util");
@@ -86,7 +86,7 @@ class PackageJsonLoader {
         if (typeof this.data === 'undefined' || this.data === null) {
             throw new Error(`data is undefined`);
         }
-        this.data = sort_package_json2_1.sortPackageJson(this.data);
+        this.data = sort_package_json_1.sortPackageJson(this.data);
         return this;
     }
     write() {
@@ -111,10 +111,13 @@ __decorate([
 __decorate([
     bind_decorator_1.default
 ], PackageJsonLoader, "loadByModuleName", null);
+// @ts-ignore
 exports.default = PackageJsonLoader;
+// @ts-ignore
 Object.assign(PackageJsonLoader, exports, {
     default: PackageJsonLoader,
     PackageJsonLoader,
 });
+// @ts-ignore
 Object.defineProperty(PackageJsonLoader, "__esModule", { value: true });
 module.exports = PackageJsonLoader;
