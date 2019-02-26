@@ -10,3 +10,4 @@ function fixBinPath(bin, root) {
     return null;
 }
 exports.fixBinPath = fixBinPath;
+//# sourceMappingURL=util.js.map

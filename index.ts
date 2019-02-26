@@ -1,29 +1,10 @@
-import * as fs from 'fs-extra';
+import fs = require('fs-extra');
 import PACKAGE_JSON = require('./package.json');
 import { sortPackageJson } from 'sort-package-json';
 import pkgUp = require('pkg-up');
 import bind from 'bind-decorator';
 import { fixBinPath } from './util';
 import path = require('path');
-
-export type IPackageJson = typeof PACKAGE_JSON & {
-	scripts: {
-		[k: string]: string,
-	},
-	bin: string | {
-		[k: string]: string,
-	},
-	directories: {
-		[k: string]: string,
-	},
-	dependencies: {
-		[k: string]: string,
-	},
-	resolutions: {
-		[k: string]: string,
-	},
-	workspaces: any,
-};
 
 export class PackageJsonLoader<T = IPackageJson>
 {
@@ -97,33 +78,51 @@ export class PackageJsonLoader<T = IPackageJson>
 
 		if (self.file && fs.existsSync(dir = self.dir))
 		{
-			if (self.data && self.data.bin)
+			if (self.data)
 			{
-				if (typeof self.data.bin === 'string')
+				if (self.data.bin)
 				{
-					let bin_new = fixBinPath(self.data.bin, dir);
-
-					if (bin_new)
+					if (typeof self.data.bin === 'string')
 					{
-						self.data.bin = bin_new;
+						let bin_new = fixBinPath(self.data.bin, dir);
+
+						if (bin_new)
+						{
+							self.data.bin = bin_new;
+						}
+					}
+					else if (typeof self.data.bin === 'object' && !Array.isArray(self.data.bin))
+					{
+						Object.keys(self.data.bin)
+							.forEach(function (key)
+							{
+								if (typeof self.data.bin[key] === 'string')
+								{
+									let bin_new = fixBinPath(self.data.bin[key], dir);
+
+									if (bin_new)
+									{
+										self.data.bin[key] = bin_new;
+									}
+								}
+							})
+						;
 					}
 				}
-				else if (typeof self.data.bin === 'object' && !Array.isArray(self.data.bin))
-				{
-					Object.keys(self.data.bin)
-						.forEach(function (key)
-						{
-							if (typeof self.data.bin[key] === 'string')
-							{
-								let bin_new = fixBinPath(self.data.bin[key], dir);
 
-								if (bin_new)
-								{
-									self.data.bin[key] = bin_new;
-								}
-							}
-						})
-					;
+				if (!self.data.publishConfig
+					&& (self.data.private === false
+						|| (
+							!self.data.private
+							&& self.data.name
+							&& /\//.test(self.data.name)
+						)
+					)
+				)
+				{
+					self.data.publishConfig = {
+						access: "public",
+					};
 				}
 			}
 		}
@@ -184,14 +183,46 @@ export class PackageJsonLoader<T = IPackageJson>
 	}
 }
 
+export import IPackageJson = PackageJsonLoader.IPackageJson;
+
+export declare module PackageJsonLoader
+{
+	export type IPackageJson = typeof PACKAGE_JSON & {
+		scripts: {
+			[k: string]: string,
+		},
+		bin: string | {
+			[k: string]: string,
+		},
+		directories: {
+			[k: string]: string,
+		},
+		dependencies: {
+			[k: string]: string,
+		},
+		resolutions: {
+			[k: string]: string,
+		},
+		workspaces: any,
+	};
+
+	// @ts-ignore
+	export { PackageJsonLoader }
+	// @ts-ignore
+	export { PackageJsonLoader as default }
+}
+
 // @ts-ignore
 export default PackageJsonLoader
+
 // @ts-ignore
 Object.assign(PackageJsonLoader, exports, {
 	default: PackageJsonLoader,
 	PackageJsonLoader,
 });
+
 // @ts-ignore
 Object.defineProperty(PackageJsonLoader, "__esModule", { value: true });
+
 // @ts-ignore
 export = PackageJsonLoader

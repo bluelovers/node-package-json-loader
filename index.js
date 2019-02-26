@@ -50,23 +50,34 @@ class PackageJsonLoader {
         let self = this;
         let dir;
         if (self.file && fs.existsSync(dir = self.dir)) {
-            if (self.data && self.data.bin) {
-                if (typeof self.data.bin === 'string') {
-                    let bin_new = util_1.fixBinPath(self.data.bin, dir);
-                    if (bin_new) {
-                        self.data.bin = bin_new;
+            if (self.data) {
+                if (self.data.bin) {
+                    if (typeof self.data.bin === 'string') {
+                        let bin_new = util_1.fixBinPath(self.data.bin, dir);
+                        if (bin_new) {
+                            self.data.bin = bin_new;
+                        }
+                    }
+                    else if (typeof self.data.bin === 'object' && !Array.isArray(self.data.bin)) {
+                        Object.keys(self.data.bin)
+                            .forEach(function (key) {
+                            if (typeof self.data.bin[key] === 'string') {
+                                let bin_new = util_1.fixBinPath(self.data.bin[key], dir);
+                                if (bin_new) {
+                                    self.data.bin[key] = bin_new;
+                                }
+                            }
+                        });
                     }
                 }
-                else if (typeof self.data.bin === 'object' && !Array.isArray(self.data.bin)) {
-                    Object.keys(self.data.bin)
-                        .forEach(function (key) {
-                        if (typeof self.data.bin[key] === 'string') {
-                            let bin_new = util_1.fixBinPath(self.data.bin[key], dir);
-                            if (bin_new) {
-                                self.data.bin[key] = bin_new;
-                            }
-                        }
-                    });
+                if (!self.data.publishConfig
+                    && (self.data.private === false
+                        || (!self.data.private
+                            && self.data.name
+                            && /\//.test(self.data.name)))) {
+                    self.data.publishConfig = {
+                        access: "public",
+                    };
                 }
             }
         }
@@ -121,3 +132,4 @@ Object.assign(PackageJsonLoader, exports, {
 // @ts-ignore
 Object.defineProperty(PackageJsonLoader, "__esModule", { value: true });
 module.exports = PackageJsonLoader;
+//# sourceMappingURL=index.js.map

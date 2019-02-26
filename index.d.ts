@@ -1,22 +1,4 @@
 import PACKAGE_JSON = require('./package.json');
-export declare type IPackageJson = typeof PACKAGE_JSON & {
-    scripts: {
-        [k: string]: string;
-    };
-    bin: string | {
-        [k: string]: string;
-    };
-    directories: {
-        [k: string]: string;
-    };
-    dependencies: {
-        [k: string]: string;
-    };
-    resolutions: {
-        [k: string]: string;
-    };
-    workspaces: any;
-};
 export declare class PackageJsonLoader<T = IPackageJson> {
     readonly file: string;
     protected json: any;
@@ -35,6 +17,29 @@ export declare class PackageJsonLoader<T = IPackageJson> {
     sort(): this;
     write(): this;
     writeWhenLoaded(): boolean;
+}
+export import IPackageJson = PackageJsonLoader.IPackageJson;
+export declare module PackageJsonLoader {
+    export type IPackageJson = typeof PACKAGE_JSON & {
+        scripts: {
+            [k: string]: string;
+        };
+        bin: string | {
+            [k: string]: string;
+        };
+        directories: {
+            [k: string]: string;
+        };
+        dependencies: {
+            [k: string]: string;
+        };
+        resolutions: {
+            [k: string]: string;
+        };
+        workspaces: any;
+    };
+    export { PackageJsonLoader };
+    export { PackageJsonLoader as default };
 }
 export default PackageJsonLoader;
 export = PackageJsonLoader;
