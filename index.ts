@@ -111,13 +111,9 @@ export class PackageJsonLoader<T = IPackageJson>
 				}
 
 				if (!self.data.publishConfig
-					&& (self.data.private === false
-						|| (
-							!self.data.private
-							&& self.data.name
-							&& /\//.test(self.data.name)
-						)
-					)
+					&& self.data.name
+					&& /\//.test(self.data.name)
+					&& !self.data.private
 				)
 				{
 					self.data.publishConfig = {
