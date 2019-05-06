@@ -20,7 +20,9 @@ export class PackageJsonLoader<T = IPackageJson>
 
 	static findPackageJsonPath(name: string): string
 	{
-		return pkgUp.sync(require.resolve(name));
+		return pkgUp.sync({
+			cwd: require.resolve(name),
+		});
 	}
 
 	@bind
@@ -179,34 +181,49 @@ export class PackageJsonLoader<T = IPackageJson>
 	}
 }
 
-export import IPackageJson = PackageJsonLoader.IPackageJson;
-
 export declare module PackageJsonLoader
 {
-	export type IPackageJson = typeof PACKAGE_JSON & {
-		scripts: {
+
+
+	export type IPackageJson = ITSOverwrite<typeof PACKAGE_JSON, {
+		scripts?: {
+			prepublishOnly?: string,
+			test?: string,
+			coverage?: string,
+			serve?: string,
+			build?: string,
+			dev?: string,
 			[k: string]: string,
 		},
-		bin: string | {
+		bin?: string | {
 			[k: string]: string,
 		},
-		directories: {
+		directories?: {
+			test?: string,
+			bin?: string,
 			[k: string]: string,
 		},
-		dependencies: {
+		dependencies?: {
 			[k: string]: string,
 		},
-		resolutions: {
+		devDependencies?: {
 			[k: string]: string,
 		},
-		workspaces: any,
-	};
+		resolutions?: {
+			[k: string]: string,
+		},
+		workspaces?: any,
+	}>;
 
 	// @ts-ignore
 	export { PackageJsonLoader }
 	// @ts-ignore
 	export { PackageJsonLoader as default }
 }
+
+// @ts-ignore
+export import IPackageJson = PackageJsonLoader.IPackageJson;
+import { ITSOverwrite } from 'ts-type';
 
 // @ts-ignore
 export default PackageJsonLoader

@@ -18,28 +18,40 @@ export declare class PackageJsonLoader<T = IPackageJson> {
     write(): this;
     writeWhenLoaded(): boolean;
 }
-export import IPackageJson = PackageJsonLoader.IPackageJson;
 export declare module PackageJsonLoader {
-    export type IPackageJson = typeof PACKAGE_JSON & {
-        scripts: {
+    export type IPackageJson = ITSOverwrite<typeof PACKAGE_JSON, {
+        scripts?: {
+            prepublishOnly?: string;
+            test?: string;
+            coverage?: string;
+            serve?: string;
+            build?: string;
+            dev?: string;
             [k: string]: string;
         };
-        bin: string | {
+        bin?: string | {
             [k: string]: string;
         };
-        directories: {
+        directories?: {
+            test?: string;
+            bin?: string;
             [k: string]: string;
         };
-        dependencies: {
+        dependencies?: {
             [k: string]: string;
         };
-        resolutions: {
+        devDependencies?: {
             [k: string]: string;
         };
-        workspaces: any;
-    };
+        resolutions?: {
+            [k: string]: string;
+        };
+        workspaces?: any;
+    }>;
     export { PackageJsonLoader };
     export { PackageJsonLoader as default };
 }
+export import IPackageJson = PackageJsonLoader.IPackageJson;
+import { ITSOverwrite } from 'ts-type';
 export default PackageJsonLoader;
 export = PackageJsonLoader;
