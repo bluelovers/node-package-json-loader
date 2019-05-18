@@ -1,10 +1,14 @@
 import fs = require('fs-extra');
-import PACKAGE_JSON = require('./package.json');
+//import PACKAGE_JSON = require('./package.json');
 import { sortPackageJson } from 'sort-package-json';
 import pkgUp = require('pkg-up');
 import bind from 'bind-decorator';
 import { fixBinPath } from './util';
 import path = require('path');
+import { IPackageJson } from '@ts-type/package-dts';
+import TsTypePackageDts = require('@ts-type/package-dts');
+
+export { IPackageJson }
 
 export class PackageJsonLoader<T = IPackageJson>
 {
@@ -184,46 +188,13 @@ export class PackageJsonLoader<T = IPackageJson>
 export declare module PackageJsonLoader
 {
 
-
-	export type IPackageJson = ITSOverwrite<typeof PACKAGE_JSON, {
-		scripts?: {
-			prepublishOnly?: string,
-			test?: string,
-			coverage?: string,
-			serve?: string,
-			build?: string,
-			dev?: string,
-			[k: string]: string,
-		},
-		bin?: string | {
-			[k: string]: string,
-		},
-		directories?: {
-			test?: string,
-			bin?: string,
-			[k: string]: string,
-		},
-		dependencies?: {
-			[k: string]: string,
-		},
-		devDependencies?: {
-			[k: string]: string,
-		},
-		resolutions?: {
-			[k: string]: string,
-		},
-		workspaces?: any,
-	}>;
+	export type IPackageJson = TsTypePackageDts.IPackageJson;
 
 	// @ts-ignore
 	export { PackageJsonLoader }
 	// @ts-ignore
 	export { PackageJsonLoader as default }
 }
-
-// @ts-ignore
-export import IPackageJson = PackageJsonLoader.IPackageJson;
-import { ITSOverwrite } from 'ts-type';
 
 // @ts-ignore
 export default PackageJsonLoader

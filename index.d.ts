@@ -1,11 +1,13 @@
-import PACKAGE_JSON = require('./package.json');
+import { IPackageJson } from '@ts-type/package-dts';
+import TsTypePackageDts = require('@ts-type/package-dts');
+export { IPackageJson };
 export declare class PackageJsonLoader<T = IPackageJson> {
     readonly file: string;
     protected json: any;
     loaded: boolean;
-    static create<T = IPackageJson>(file: string, ...argv: any[]): import("./index.js").PackageJsonLoader<T>;
+    static create<T = IPackageJson>(file: string, ...argv: any[]): import(".").PackageJsonLoader<T>;
     static findPackageJsonPath(name: string): string;
-    static loadByModuleName<T = IPackageJson>(name: string): import("./index.js").PackageJsonLoader<T>;
+    static loadByModuleName<T = IPackageJson>(name: string): import(".").PackageJsonLoader<T>;
     constructor(file: string, ...argv: any[]);
     readonly dir: string;
     data: IPackageJson;
@@ -19,39 +21,9 @@ export declare class PackageJsonLoader<T = IPackageJson> {
     writeWhenLoaded(): boolean;
 }
 export declare module PackageJsonLoader {
-    export type IPackageJson = ITSOverwrite<typeof PACKAGE_JSON, {
-        scripts?: {
-            prepublishOnly?: string;
-            test?: string;
-            coverage?: string;
-            serve?: string;
-            build?: string;
-            dev?: string;
-            [k: string]: string;
-        };
-        bin?: string | {
-            [k: string]: string;
-        };
-        directories?: {
-            test?: string;
-            bin?: string;
-            [k: string]: string;
-        };
-        dependencies?: {
-            [k: string]: string;
-        };
-        devDependencies?: {
-            [k: string]: string;
-        };
-        resolutions?: {
-            [k: string]: string;
-        };
-        workspaces?: any;
-    }>;
+    export type IPackageJson = TsTypePackageDts.IPackageJson;
     export { PackageJsonLoader };
     export { PackageJsonLoader as default };
 }
-export import IPackageJson = PackageJsonLoader.IPackageJson;
-import { ITSOverwrite } from 'ts-type';
 export default PackageJsonLoader;
 export = PackageJsonLoader;
