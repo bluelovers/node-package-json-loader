@@ -1,29 +1,45 @@
+/// <reference types="node" />
 import { IPackageJson } from '@ts-type/package-dts';
-import TsTypePackageDts = require('@ts-type/package-dts');
+import * as TsTypePackageDts from '@ts-type/package-dts';
 export { IPackageJson };
-export declare class PackageJsonLoader<T = IPackageJson> {
+declare type IFileOrJson = Buffer | string | object | IPackageJson;
+declare type IPackageJsonLike<T> = Partial<T> | Record<string, any>;
+declare type IItemOrItemArray<T> = T | T[];
+export declare class PackageJsonLoader<T extends IPackageJsonLike<IPackageJson> = IPackageJson> {
     readonly file: string;
-    protected json: any;
+    protected json: T;
     loaded: boolean;
-    static create<T = IPackageJson>(file: string, ...argv: any[]): import(".").PackageJsonLoader<T>;
+    protected _use: ((json: IPackageJsonLike<T>) => void)[];
+    static create<T = IPackageJson>(file: IFileOrJson, ...argv: any[]): PackageJsonLoader<T>;
+    static createByJson<T = IPackageJson>(json: T, ...argv: any[]): PackageJsonLoader<T>;
     static findPackageJsonPath(name: string): string;
-    static loadByModuleName<T = IPackageJson>(name: string): import(".").PackageJsonLoader<T>;
-    constructor(file: string, ...argv: any[]);
+    static loadByModuleName<T = IPackageJson>(name: string): PackageJsonLoader<T>;
+    constructor(fileOrJson: IFileOrJson, ...argv: any[]);
+    use(ls: IItemOrItemArray<(json: IPackageJsonLike<T>) => void>): void;
+    setFilename(file: string): this;
+    setJson(json: object | T): this;
+    read(reload?: boolean): this;
     readonly dir: string;
-    data: IPackageJson;
-    overwrite(json: any): this;
+    /**
+     * skip typescript type check
+     */
+    /**
+    * skip typescript type check
+    */
+    unsafeTypeData: IPackageJsonLike<T>;
+    data: T;
+    overwrite(json: object | T): this;
     autofix(): void;
+    run(options?: {
+        autofix?: boolean;
+    }): this;
     exists(): boolean;
-    read(): this;
     stringify(): string;
     sort(): this;
     write(): this;
-    writeWhenLoaded(): boolean;
+    writeOnlyWhenLoaded(): boolean;
 }
 export declare module PackageJsonLoader {
-    export type IPackageJson = TsTypePackageDts.IPackageJson;
-    export { PackageJsonLoader };
-    export { PackageJsonLoader as default };
+    type IPackageJson = TsTypePackageDts.IPackageJson;
 }
 export default PackageJsonLoader;
-export = PackageJsonLoader;

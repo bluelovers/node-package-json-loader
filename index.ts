@@ -1,25 +1,39 @@
-import fs = require('fs-extra');
+import fs from 'fs-extra';
 //import PACKAGE_JSON = require('./package.json');
 import { sortPackageJson } from 'sort-package-json';
-import pkgUp = require('pkg-up');
+import pkgUp from 'pkg-up';
 import bind from 'bind-decorator';
 import { fixBinPath } from './util';
-import path = require('path');
+import path from 'path';
 import { IPackageJson } from '@ts-type/package-dts';
-import TsTypePackageDts = require('@ts-type/package-dts');
+import * as TsTypePackageDts from '@ts-type/package-dts';
+import { Once } from 'lodash-decorators/once';
 
 export { IPackageJson }
 
-export class PackageJsonLoader<T = IPackageJson>
+type IFileOrJson = Buffer | string | object | IPackageJson
+
+type IPackageJsonLike<T> = Partial<T> | Record<string, any>;
+
+type IItemOrItemArray<T> = T | T[];
+
+export class PackageJsonLoader<T extends IPackageJsonLike<IPackageJson> = IPackageJson>
 {
 	readonly file: string;
-	protected json;
+	protected json: T;
 	loaded: boolean;
 
+	protected _use: ((json: IPackageJsonLike<T>) => void)[] = [];
+
 	@bind
-	static create<T = IPackageJson>(file: string, ...argv)
+	static create<T = IPackageJson>(file: IFileOrJson, ...argv)
 	{
 		return new this<T>(file, ...argv)
+	}
+
+	static createByJson<T = IPackageJson>(json: T, ...argv)
+	{
+		return new this<T>(json, ...argv)
 	}
 
 	static findPackageJsonPath(name: string): string
@@ -32,21 +46,76 @@ export class PackageJsonLoader<T = IPackageJson>
 	@bind
 	static loadByModuleName<T = IPackageJson>(name: string)
 	{
-		let file = this.findPackageJsonPath(name)
+		let file = this.findPackageJsonPath(name);
 
 		let pkg = this.create<T>(file);
 
-		if (pkg.data.name !== name)
+		if ((pkg.data as any).name !== name)
 		{
-			throw new TypeError(`package name not match, '${pkg.data.name}' != '${name}'`);
+			throw new TypeError(`package name not match, '${(pkg.data as any).name}' != '${name}'`);
 		}
 
 		return pkg;
 	}
 
-	constructor(file: string, ...argv)
+	constructor(fileOrJson: IFileOrJson, ...argv)
 	{
+		if (typeof fileOrJson === 'string')
+		{
+			this.setFilename(fileOrJson)
+		}
+		else if (Buffer.isBuffer(fileOrJson))
+		{
+			this.setJson(JSON.parse(fileOrJson.toString()))
+		}
+		else if (typeof fileOrJson === 'object')
+		{
+			this.setJson(JSON.parse(fileOrJson.toString()))
+		}
+		else if (fileOrJson != null)
+		{
+			throw new TypeError(`fileOrJson is not valid`)
+		}
+	}
+
+	use(ls: IItemOrItemArray<(json: IPackageJsonLike<T>) => void>)
+	{
+		if (Array.isArray(ls))
+		{
+			this._use.push(...ls);
+		}
+		else
+		{
+			this._use.push(ls);
+		}
+	}
+
+	setFilename(file: string)
+	{
+		// @ts-ignore
 		this.file = file;
+
+		return this;
+	}
+
+	setJson(json: object | T)
+	{
+		this.loaded = true;
+		this.json = json as T;
+
+		return this;
+	}
+
+	read(reload?: boolean)
+	{
+		if (!this.loaded || reload)
+		{
+			this.json = fs.readJSONSync(this.file);
+		}
+
+		this.loaded = true;
+
+		return this;
 	}
 
 	get dir()
@@ -54,12 +123,28 @@ export class PackageJsonLoader<T = IPackageJson>
 		return path.dirname(this.file)
 	}
 
-	set data(json)
+	/**
+	 * skip typescript type check
+	 */
+	get unsafeTypeData(): IPackageJsonLike<T>
+	{
+		return this.data as any;
+	}
+
+	/**
+	 * skip typescript type check
+	 */
+	set unsafeTypeData(json)
+	{
+		this.data = json as any;
+	}
+
+	set data(json: T)
 	{
 		this.overwrite(json);
 	}
 
-	get data(): IPackageJson
+	get data(): T
 	{
 		if (!this.loaded && this.file)
 		{
@@ -69,10 +154,10 @@ export class PackageJsonLoader<T = IPackageJson>
 		return this.json;
 	}
 
-	overwrite(json)
+	overwrite(json: object | T)
 	{
 		this.loaded = true;
-		this.json = json;
+		this.json = json as T;
 
 		return this;
 	}
@@ -130,17 +215,23 @@ export class PackageJsonLoader<T = IPackageJson>
 		}
 	}
 
+	run(options: {
+		autofix?: boolean
+	} = {})
+	{
+		if (options.autofix == null || options.autofix)
+		{
+			this.autofix();
+		}
+
+		this._use.forEach(fn => fn.call(this, this.data));
+
+		return this;
+	}
+
 	exists()
 	{
 		return fs.existsSync(this.file)
-	}
-
-	read()
-	{
-		this.loaded = true;
-		this.json = fs.readJSONSync(this.file);
-
-		return this;
 	}
 
 	stringify()
@@ -167,14 +258,12 @@ export class PackageJsonLoader<T = IPackageJson>
 			throw new Error(`file is undefined`)
 		}
 
-		fs.writeJSONSync(this.file, this.json, {
-			spaces: 2,
-		});
+		fs.writeFileSync(this.file, this.stringify());
 
 		return this;
 	}
 
-	writeWhenLoaded()
+	writeOnlyWhenLoaded()
 	{
 		if (this.loaded)
 		{
@@ -187,26 +276,7 @@ export class PackageJsonLoader<T = IPackageJson>
 
 export declare module PackageJsonLoader
 {
-
 	export type IPackageJson = TsTypePackageDts.IPackageJson;
-
-	// @ts-ignore
-	export { PackageJsonLoader }
-	// @ts-ignore
-	export { PackageJsonLoader as default }
 }
 
-// @ts-ignore
 export default PackageJsonLoader
-
-// @ts-ignore
-Object.assign(PackageJsonLoader, exports, {
-	default: PackageJsonLoader,
-	PackageJsonLoader,
-});
-
-// @ts-ignore
-Object.defineProperty(PackageJsonLoader, "__esModule", { value: true });
-
-// @ts-ignore
-export = PackageJsonLoader
