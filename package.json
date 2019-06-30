@@ -1,6 +1,6 @@
 {
   "name": "npm-package-json-loader",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "private": false,
   "description": "Find and load configuration from a package.json",
   "keywords": [
@@ -43,13 +43,13 @@
   },
   "config": {},
   "dependencies": {
-    "@ts-type/package-dts": "^1.0.3",
+    "@ts-type/package-dts": "^1.0.4",
     "bind-decorator": "^1.0.11",
-    "fs-extra": "^8.0.1",
+    "fs-extra": "^8.1.0",
     "lodash-decorators": "^6.0.1",
     "pkg-up": "^3.1.0",
     "sort-package-json": "^1.22.1",
-    "ts-type": "^1.2.4"
+    "ts-type": "^1.2.9"
   },
   "devDependencies": {},
   "peerDependencies": {},

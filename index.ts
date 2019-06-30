@@ -1,4 +1,4 @@
-import fs from 'fs-extra';
+import * as fs from 'fs-extra';
 //import PACKAGE_JSON = require('./package.json');
 import { sortPackageJson } from 'sort-package-json';
 import pkgUp from 'pkg-up';
